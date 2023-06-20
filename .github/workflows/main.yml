@@ -1,0 +1,35 @@
+name: Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+  DOCKERHUB_PASS: ${{ secrets.DOCKERHUB_PASS }}
+  GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+
+jobs:
+  Pipeline:
+    name: Default
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Reusing Workflows
+      uses: actions/checkout@v3
+      with:
+        repository: punkerside/titan-core
+        ref: main
+        path: .script/
+
+    - name: Build
+      uses: ./.script/pipelines/image/github
+      with:
+        DOCKERHUB_USER: ${DOCKERHUB_USER}
+        DOCKERHUB_PASS: ${DOCKERHUB_PASS}
+        GIT_TOKEN: ${GIT_TOKEN}
